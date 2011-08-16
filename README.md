@@ -35,4 +35,4 @@ From there on, all (supported) calls to AWS::S3::S3Object will be first checked 
 
 Copyright (c) 2011 Kyle Fritz
 
-This gem was heavily inspired by (mock-aws-s3)[https://github.com/jkrall/mock-aws-s3]
+This gem was heavily inspired by [mock-aws-s3](https://github.com/jkrall/mock-aws-s3)

@@ -1,4 +1,4 @@
-= cache-aws-s3
+#cache-aws-s3
 
 This gem adds local file caching for the AWS::S3 library. The best use case is if you use S3 to store the readonly/library copy of some object that you need occasionally transform (resize, retouch, etc).
 
@@ -21,7 +21,7 @@ From there on, all (supported) calls to AWS::S3::S3Object will be first checked 
     AWS::S3::S3Object.perge_local! 'key', 'bucket'
 
 
-== Note on Patches/Pull Requests
+##Note on Patches/Pull Requests
 
 * Fork the project.
 * Make your feature addition or bug fix.
@@ -31,7 +31,7 @@ From there on, all (supported) calls to AWS::S3::S3Object will be first checked 
   (if you want to have your own version, that is fine but bump version in a commit by itself I can ignore when I pull)
 * Send me a pull request. Bonus points for topic branches.
 
-== Copyright
+##Copyright
 
 Copyright (c) 2011 Kyle Fritz
 

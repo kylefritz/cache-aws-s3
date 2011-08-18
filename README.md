@@ -11,7 +11,6 @@ From there on, all (supported) calls to AWS::S3::S3Object will be first checked 
     S3FileCache.enable true
     S3FileCache.cache_dir /var/s3filecache
 
-    AWS::S3::S3Object.find 'key', 'some data', 'bucket'
     AWS::S3::S3Object.value 'key', 'bucket'
 
     AWS::S3::S3Object.cached_local? 'key', 'bucket'

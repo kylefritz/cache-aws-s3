@@ -7,8 +7,8 @@ Gem::Specification.new do |s|
   s.version     = Cache::AWS::S3::VERSION
   s.authors     = ["Kyle Fritz"]
   s.email       = ["kyle.p.fritz@gmail.com"]
-  s.homepage    = ""
-  s.summary     = %q{speed up repeated access to s3 data with a local cache}
+  s.homepage    = "https://github.com/kylefritz/cache-aws-s3"
+  s.summary     = %q{local cache for s3 data}
   s.description = %q{speed up repeated access to s3 data with a local cache}
 
   s.rubyforge_project = "cache-aws-s3"

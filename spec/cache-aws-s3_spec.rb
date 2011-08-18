@@ -3,9 +3,34 @@ require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 describe "Cache::AWS::S3" do
 
   describe 'when using S3Object' do
-    it 'passes through to regular aws when disabled' do
+    before (:each){ S3FileCache.enabled=true }
 
+    it 'resolves files locally' do
+      bucket="mittens"
+      key="these/are/our/vista.txt"
+      fp=AWS::S3::S3Object.file_path! key,bucket
+      fp.should == "#{S3FileCache.cache_dir}/#{bucket}/#{key}"
     end
+    it 'should hit local cache first' do
+        AWS::S3::S3Object.should_not_receive(:get)
+        AWS::S3::S3Object.value 'to_key', 'bucket'
+    end
+    it 'passes through to regular aws when disabled' do
+        S3FileCache.enabled=false
+        AWS::S3::S3Object.should_receive(:get)
+        AWS::S3::S3Object.value 'to_key', 'bucket'
+    end
+    it 'reads data out of local cache' do
+      #setup
+      bucket="mittens"
+      key="these/are/our/vista.txt"
+      fp=AWS::S3::S3Object.file_path! key, bucket
+      File.open(fp, 'w') {|f| f.write 'test data'}
+
+      val=AWS::S3::S3Object.read_cache key, bucket
+      val.response.should == 'test data'
+    end
+
   end
 
 #  describe 'when using S3Object' do

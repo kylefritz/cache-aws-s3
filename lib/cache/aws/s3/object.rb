@@ -8,8 +8,8 @@ class S3FileCache
       self.enabled
     end
   end
-  @enabled=false
-  @cache_dir = "./s3filecache/"
+  @enabled=true
+  @cache_dir = "./s3filecache"
 end
 
 module AWS
@@ -19,36 +19,47 @@ module AWS
       class << self
 
         #save old value method
-        alias value s3_value
+        #alias value s3_value
 
         #TODO: ignoring the &block for the moment
         def value(key, bucket = nil, options = {}, &block)
-          if S3FileCache.enabled and  cached_local? key, bucket
-            data = File.open(file_path!(bucket, key, options)) {|f| f.read}
-            Value.new OpenStruct.new(:body=>data)
+          if not S3FileCache.enabled
+            return s3_value(key,bucket,options,&block);
+          end
+
+          if cached_local? key, bucket
+            #return cached object
+            read_cache(key,bucket,options)
           else
             #1. open normal S3 file
             value = s3_value(key,bucket,options) #omitting the block for now
 
-            if S3FileCache.enabled
-              #2. save local to file_path! (make parent directories)
-              fp=file_path!(bucket,key,options)
-              FileUtils.mkdir_p File.dirname fp
-              File.open(fp) {|io| io.write value.response}
-            end
+            #2. save local to file_path! (make parent directories)
+            cache_local(value,key,bucket,options)
 
             #3. return the value object
             value
           end
         end
 
-        def file_path!(bucket, name, options = {}) #:nodoc:
+        def read_cache(key,bucket,options={})
+            data = File.open(file_path!(key,bucket, options)) {|f| f.read}
+            Value.new OpenStruct.new(:body=>data)
+        end
+
+        def cache_local(value,key,bucket,options={})
+            fp=file_path!(key,bucket,options)
+            FileUtils.mkdir_p File.dirname fp
+            File.open(fp,'w') {|io| io.write value.response}
+        end
+
+        def file_path!(key,bucket, options = {}) #:nodoc:
           # We're using the second argument for options
           if bucket.is_a?(Hash)
             options.replace(bucket)
             bucket = nil
           end
-          S3FileCache.cache_dir.clone << File.join(bucket_name(bucket), name)
+          S3FileCache.cache_dir.clone << File.join(bucket_name(bucket), key)
         end
 
         def perge_local!(key,bucket)

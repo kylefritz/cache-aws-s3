@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 $:.push File.expand_path("../lib", __FILE__)
-require "cache-aws-s3/version"
+require "cache/aws/s3/version"
 
 Gem::Specification.new do |s|
   s.name        = "cache-aws-s3"

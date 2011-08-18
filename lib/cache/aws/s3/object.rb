@@ -18,16 +18,27 @@ module AWS
     class S3Object
       class << self
 
-        #TODO: save old value method
+        #save old value method
+        alias value s3_value
+
+        #TODO: ignoring the &block for the moment
         def value(key, bucket = nil, options = {}, &block)
-          if cached_local? key, bucket
-            data = File.open(path!(bucket, key, options)) {|f| f.read}
+          if S3FileCache.enabled and  cached_local? key, bucket
+            data = File.open(file_path!(bucket, key, options)) {|f| f.read}
             Value.new OpenStruct.new(:body=>data)
           else
-            #TODO:
             #1. open normal S3 file
-            #2. save local to file_path! (make parent directories)
-            #3. return stream
+            value = s3_value(key,bucket,options) #omitting the block for now
+
+            if S3FileCache.enabled
+              #2. save local to file_path! (make parent directories)
+              fp=file_path!(bucket,key,options)
+              FileUtils.mkdir_p File.dirname fp
+              File.open(fp) {|io| io.write value.response}
+            end
+
+            #3. return the value object
+            value
           end
         end
 
@@ -42,10 +53,13 @@ module AWS
 
         def perge_local!(key,bucket)
           #return delete file at file_path!(bucket,name)
+          file_path= file_path!(key,bucket)
+          File.unlink file_path if File.exists? file_path
         end
 
         def cached_local?(key,bucket)
           #return file exists? at file_path!(bucket,name)
+          File.exists? file_path!(key,bucket)
         end
 
       end

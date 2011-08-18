@@ -9,7 +9,7 @@ class S3FileCache
     end
   end
   @enabled=true
-  @cache_dir = "./s3filecache"
+  @cache_dir = "./tmp"
 end
 
 module AWS
@@ -19,13 +19,12 @@ module AWS
       class << self
 
         #save old value method
-        #alias value s3_value
+        alias s3_value value
 
         #TODO: ignoring the &block for the moment
         def value(key, bucket = nil, options = {}, &block)
-          if not S3FileCache.enabled
-            return s3_value(key,bucket,options,&block);
-          end
+
+          return s3_value(key,bucket,options,&block) if not S3FileCache.enabled?
 
           if cached_local? key, bucket
             #return cached object
@@ -59,7 +58,7 @@ module AWS
             options.replace(bucket)
             bucket = nil
           end
-          S3FileCache.cache_dir.clone << File.join(bucket_name(bucket), key)
+          File.join(S3FileCache.cache_dir, bucket_name(bucket), key)
         end
 
         def perge_local!(key,bucket)
